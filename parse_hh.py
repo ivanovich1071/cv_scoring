@@ -14,13 +14,12 @@ def get_html(url: str):
 def extract_vacancy_data(html):
     soup = BeautifulSoup(html, "html.parser")
 
-    def get_element(selector, attribute=None):
+    def get_element(selector, default="Не указано"):
         element = soup.select_one(selector)
-        return element.get_text(strip=True) if element else "Не указано"
+        return element.get_text(strip=True) if element else default
 
-    # Извлечение данных
     title = get_element("h1[data-qa='vacancy-title']")
-    salary = get_element("span.bloko-header-section-2.bloko-header-section-2_lite")
+    salary = get_element("span.bloko-header-section-2")
     experience = get_element("span[data-qa='vacancy-experience']")
     employment_mode = get_element("p[data-qa='vacancy-view-employment-mode']")
     company = get_element("a[data-qa='vacancy-company-name']")
@@ -47,6 +46,17 @@ def extract_vacancy_data(html):
 """
 
     return markdown.strip()
+def get_job_description(url):
+    try:
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response.raise_for_status()
+        return extract_vacancy_data(response.text)
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при загрузке страницы: {e}")
+        return "Не удалось загрузить страницу"
+    except Exception as e:
+        print(f"Ошибка при обработке данных: {e}")
+        return "Ошибка обработки данных"
 
 def extract_candidate_data(html):
     soup = BeautifulSoup(html, 'html.parser')
