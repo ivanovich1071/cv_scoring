@@ -1,7 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
+import os
 
-def get_html(url: str):
+# Функция для получения HTML страницы
+
+def get_html(url: str, output_file: str):
     response = requests.get(
         url,
         headers={
@@ -9,7 +12,14 @@ def get_html(url: str):
         },
     )
     response.raise_for_status()
+
+    # Сохранение структуры страницы в файл
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write(response.text)
+
     return response.text
+
+# Функция для извлечения данных из вакансии
 
 def extract_vacancy_data(html):
     soup = BeautifulSoup(html, "html.parser")
@@ -46,17 +56,8 @@ def extract_vacancy_data(html):
 """
 
     return markdown.strip()
-def get_job_description(url):
-    try:
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
-        response.raise_for_status()
-        return extract_vacancy_data(response.text)
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка при загрузке страницы: {e}")
-        return "Не удалось загрузить страницу"
-    except Exception as e:
-        print(f"Ошибка при обработке данных: {e}")
-        return "Ошибка обработки данных"
+
+# Функция для извлечения данных из резюме
 
 def extract_candidate_data(html):
     soup = BeautifulSoup(html, 'html.parser')
@@ -98,3 +99,13 @@ def extract_candidate_data(html):
     markdown += ', '.join(skills) + "\n"
 
     return markdown.strip()
+
+# Основная функция обработки страницы
+
+def process_page(url, output_structure_file, output_data_file, extractor):
+    html = get_html(url, output_structure_file)
+    data = extractor(html)
+
+    # Сохранение данных в файл
+    with open(output_data_file, "w", encoding="utf-8") as f:
+        f.write(data)
