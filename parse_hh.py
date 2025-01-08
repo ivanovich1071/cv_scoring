@@ -21,37 +21,36 @@ def extract_vacancy_data(html):
     soup = BeautifulSoup(html, "html.parser")
 
     # Извлечение заголовка вакансии
-    title = soup.find("h1", {"data-qa": "vacancy-title"}).text.strip()
+    title_element = soup.find("h1", {"data-qa": "vacancy-title"})
+    title = title_element.text.strip() if title_element else "Заголовок не найден"
 
     # Извлечение зарплаты
-    salary = soup.find(
-        "span", {"data-qa": "vacancy-salary-compensation-type-net"}
-    ).text.strip()
+    salary_element = soup.find("span", {"data-qa": "vacancy-salary-compensation-type-net"})
+    salary = salary_element.text.strip() if salary_element else "Зарплата не указана"
 
     # Извлечение опыта работы
-    experience = soup.find("span", {"data-qa": "vacancy-experience"}).text.strip()
+    experience_element = soup.find("span", {"data-qa": "vacancy-experience"})
+    experience = experience_element.text.strip() if experience_element else "Опыт не указан"
 
     # Извлечение типа занятости и режима работы
-    employment_mode = soup.find(
-        "p", {"data-qa": "vacancy-view-employment-mode"}
-    ).text.strip()
+    employment_mode_element = soup.find("p", {"data-qa": "vacancy-view-employment-mode"})
+    employment_mode = employment_mode_element.text.strip() if employment_mode_element else "Не указано"
 
     # Извлечение компании
-    company = soup.find("a", {"data-qa": "vacancy-company-name"}).text.strip()
+    company_element = soup.find("a", {"data-qa": "vacancy-company-name"})
+    company = company_element.text.strip() if company_element else "Компания не указана"
 
     # Извлечение местоположения
-    location = soup.find("p", {"data-qa": "vacancy-view-location"}).text.strip()
+    location_element = soup.find("p", {"data-qa": "vacancy-view-location"})
+    location = location_element.text.strip() if location_element else "Местоположение не указано"
 
     # Извлечение описания вакансии
-    description = soup.find("div", {"data-qa": "vacancy-description"}).text.strip()
+    description_element = soup.find("div", {"data-qa": "vacancy-description"})
+    description = description_element.text.strip() if description_element else "Описание не указано"
 
     # Извлечение ключевых навыков
-    skills = [
-        skill.text.strip()
-        for skill in soup.find_all(
-            "div", {"class": "magritte-tag__label___YHV-o_3-0-3"}
-        )
-    ]
+    skills_elements = soup.find_all("div", {"class": "magritte-tag__label___YHV-o_3-0-3"})
+    skills = [skill.text.strip() for skill in skills_elements] if skills_elements else ["Навыки не указаны"]
 
     # Формирование строки в формате Markdown
     markdown = f"""
